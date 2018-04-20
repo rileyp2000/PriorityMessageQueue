@@ -14,4 +14,10 @@ public class MessagePriorityQueue {
 		for(int i = 0; i < 5; i++)
 			priorities.add(new PriorityQueue<Message>());
 	}
+	
+	public static void main(String[] args) {
+		for(int i = 0; i < 20; i++) {
+			
+		}
+	}
 }

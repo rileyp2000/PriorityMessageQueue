@@ -3,7 +3,7 @@
  * @author rileyp
  *
  */
-public class Message {
+public class Message implements Comparable{
 	private int priority, arrival;
 	
 	public Message() {
@@ -19,7 +19,9 @@ public class Message {
 		return priority;
 	}
 	
-	public int compareTo(Message m) {
-		
+
+	@Override
+	public int compareTo(Object m) {
+		return priority - ((Message) m).getPriority();
 	}
 }
