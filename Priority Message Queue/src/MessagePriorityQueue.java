@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -8,47 +9,72 @@ import java.util.Queue;
  *
  */
 public class MessagePriorityQueue {
-	private ArrayList<Queue<Message>> priorities;
+	
+	private ArrayList<LinkedList<Message>> priorities;
 	private ArrayList<ArrayList<Integer>> times;
+	
 	private final static int TOTAL_MESSAGES = 35;
-
+	
+	/**
+	 * Instantiates the 5 queues of messages and the arraylists of the various times of each
+	 */
 	public MessagePriorityQueue() {
-		priorities = new ArrayList<Queue<Message>>();
+		priorities = new ArrayList<LinkedList<Message>>();
 		times = new ArrayList<ArrayList<Integer>>();
+		
 		for (int i = 0; i < 5; i++)
-			priorities.add(new PriorityQueue<Message>());
+			priorities.add(new LinkedList<Message>());
+		
 		for (int i = 0; i < 5; i++)
 			times.add(new ArrayList<Integer>());
 	}
-
+	
+	/**
+	 * Places the message into the proper queue based on its priority
+	 * @param m The message to be placed into a queue
+	 */
 	public void sort(Message m) {
 		System.out.println("S " + m);
 		int pri = m.getPriority();
 		priorities.get(pri).add(m);
 	}
-
+	
+	/**
+	 * Removes the first message that has been waiting for more than 4 minutes
+	 * @param cur The current time
+	 */
 	public void processMessages(int cur) {
 		for (int i = 0; i < 5; i++) {
 			if (priorities.get(i).peek() != null) {
 				if (cur - priorities.get(i).peek().getArrival() > 4) {
 					Message m = priorities.get(i).remove();
-					System.out.println(m);
+					//System.out.println(m);
+					
+					//for analysis purposes
 					times.get(m.getPriority()).add(cur - m.getArrival());
 					return;
 				}
 			}
 		}
 	}
-
+	
+	/**
+	 * Adds some values to the queues before the removal begins
+	 * @return the time at which the loop stops iterating
+	 */
 	public int prefill() {
 		int i = 1;
 		for (i = 1; i <= 15; i++) {
 			Message m = new Message(i);
 			sort(m);
 		}
-		return i;
+		return i-1;
 	}
-
+	
+	/**
+	 * Removes any remaining values from the queues
+	 * @param i the time at which to begin removing the messages
+	 */
 	public void removeRest(int i) {
 		while (priorities.get(0).peek() != null || priorities.get(1).peek() != null || priorities.get(2).peek() != null
 				|| priorities.get(3).peek() != null || priorities.get(4).peek() != null) {
@@ -57,7 +83,10 @@ public class MessagePriorityQueue {
 		}
 
 	}
-
+	
+	/**
+	 * Analysis of the wait times for the various priorities
+	 */
 	public void analyzeWait() {
 		int sum = 0;
 		for (int queue = 0; queue < 5; queue++) {
@@ -72,9 +101,11 @@ public class MessagePriorityQueue {
 
 	public static void main(String[] args) {
 		MessagePriorityQueue sim = new MessagePriorityQueue();
-
+		
+		//adds values to the queues to begin
 		int i = sim.prefill();
-
+		
+		//Starts adding and removing more values
 		for (i = i + 1; i <= TOTAL_MESSAGES; i++) {
 			Message m = new Message(i);
 			sim.sort(m);
