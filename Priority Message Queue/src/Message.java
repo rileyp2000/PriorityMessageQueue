@@ -7,7 +7,7 @@ import java.util.Random;
  */
 public class Message implements Comparable{
 	private int priority, arrival;
-	private static final Random R = new Random(2000);
+	private static final Random R = new Random(651465733);
 	
 	/**
 	 * This Creates a new message with a given arrival time

@@ -11,22 +11,25 @@ import java.util.Queue;
 public class MessagePriorityQueue {
 	
 	private ArrayList<LinkedList<Message>> priorities;
-	private ArrayList<ArrayList<Integer>> times;
+	private ArrayList<ArrayList<TimeData>> times;
 	
-	private final static int TOTAL_MESSAGES = 35;
+	private final static int TOTAL_MESSAGES = 10000;
+	
+	private int[] totals;
 	
 	/**
 	 * Instantiates the 5 queues of messages and the arraylists of the various times of each
 	 */
 	public MessagePriorityQueue() {
 		priorities = new ArrayList<LinkedList<Message>>();
-		times = new ArrayList<ArrayList<Integer>>();
+		times = new ArrayList<ArrayList<TimeData>>();
 		
 		for (int i = 0; i < 5; i++)
 			priorities.add(new LinkedList<Message>());
 		
 		for (int i = 0; i < 5; i++)
-			times.add(new ArrayList<Integer>());
+			times.add(new ArrayList<TimeData>());
+		totals = new int[5];
 	}
 	
 	/**
@@ -34,9 +37,10 @@ public class MessagePriorityQueue {
 	 * @param m The message to be placed into a queue
 	 */
 	public void sort(Message m) {
-		System.out.println("S " + m);
+		System.out.println(m);
 		int pri = m.getPriority();
 		priorities.get(pri).add(m);
+		totals[pri] = totals[pri] + 1;
 	}
 	
 	/**
@@ -46,12 +50,12 @@ public class MessagePriorityQueue {
 	public void processMessages(int cur) {
 		for (int i = 0; i < 5; i++) {
 			if (priorities.get(i).peek() != null) {
-				if (cur - priorities.get(i).peek().getArrival() > 4) {
+				if (cur - priorities.get(i).peek().getArrival() >= 4) {
 					Message m = priorities.get(i).remove();
 					//System.out.println(m);
 					
 					//for analysis purposes
-					times.get(m.getPriority()).add(cur - m.getArrival());
+					times.get(m.getPriority()).add(new TimeData(cur,cur - m.getArrival()));
 					return;
 				}
 			}
@@ -63,8 +67,8 @@ public class MessagePriorityQueue {
 	 * @return the time at which the loop stops iterating
 	 */
 	public int prefill() {
-		int i = 1;
-		for (i = 1; i <= 15; i++) {
+		int i = 0;
+		for (i = 1; i <= 8; i++) {
 			Message m = new Message(i);
 			sort(m);
 		}
@@ -88,10 +92,13 @@ public class MessagePriorityQueue {
 	 * Analysis of the wait times for the various priorities
 	 */
 	public void analyzeWait() {
+		for(int m = 0; m < 5; m++)
+			System.out.println(totals[m]);
+		System.out.println(times);
 		int sum = 0;
 		for (int queue = 0; queue < 5; queue++) {
-			for (int i : times.get(queue)) {
-				sum += i;
+			for (TimeData i : times.get(queue)) {
+				sum += i.getWaitTime();
 			}
 			System.out.println("Message of Priority " + queue + " has average wait of :"
 					+ ((sum + 0.0) / times.get(queue).size()) + " minutes");
